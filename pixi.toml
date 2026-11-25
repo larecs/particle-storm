@@ -1,0 +1,32 @@
+[workspace]
+authors = ["Mose Schmiedel <mose@schmiednet.de>"]
+channels = [
+    "conda-forge",
+    "https://repo.prefix.dev/max",
+    "https://prefix.dev/tree-d",
+]
+description = "GPU particle storm with SDL3 display"
+name = "particle-storm"
+platforms = ["linux-64", "osx-arm64"]
+version = "0.4.0"
+preview = ["pixi-build"]
+
+[tasks]
+particles = { cmd = "mojo run -I . -Xlinker -L\"$CONDA_PREFIX/lib\" -Xlinker -lSDL3 main.mojo", default-environment = "default" }
+profiling = { cmd = "mojo run -I . -Xlinker -L\"$CONDA_PREFIX/lib\" -Xlinker -lSDL3 -Xlinker -lmojotracy -DTRACY_ENABLED main.mojo", default-environment = "default" }
+
+test-display = { cmd = "mojo run -I . -Xlinker -L\"$CONDA_PREFIX/lib\" -Xlinker -lSDL3 tests/test_display.mojo", env = { SDL_VIDEODRIVER = "dummy" } }
+test-weather = { cmd = "mojo run -I . tests/test_weather.mojo" }
+test-editor = { cmd = "mojo run -I . tests/test_editor.mojo" }
+test-contacts = { cmd = "mojo run -I . tests/test_contacts.mojo" }
+
+[dependencies]
+# 1.0.0b2 release candidate, pinned until the beta package is published.
+larecs = { git = "https://github.com/larecs/larecs.git", rev = "d53ffa1b27cb9e0aad9d9322d14facae8aae8ffd" }
+mojo = ">=1.0.0,<1.1.0"
+mojo-tracy = ">=1.1.0,<2"
+max = ">=26.5.0,<26.6"
+sdl3 = ">=3.2.0,<4"
+
+[target.osx-arm64.activation]
+scripts = ["scripts/activate_macos_sdk.sh"]
