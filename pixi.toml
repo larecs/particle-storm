@@ -15,6 +15,11 @@ preview = ["pixi-build"]
 particles = { cmd = "mojo run -I . -Xlinker -L\"$CONDA_PREFIX/lib\" -Xlinker -lSDL3 main.mojo", default-environment = "default" }
 profiling = { cmd = "mojo run -I . -Xlinker -L\"$CONDA_PREFIX/lib\" -Xlinker -lSDL3 -Xlinker -lmojotracy -DTRACY_ENABLED main.mojo", default-environment = "default" }
 
+format = "mojo format -q main.mojo storm tests"
+build = { cmd = "mkdir -p build && mojo build -I . -Xlinker -L\"$CONDA_PREFIX/lib\" -Xlinker -lSDL3 main.mojo -o build/particles", default-environment = "default" }
+smoke = { cmd = "./build/particles --frames 30 --particles 10000", depends-on = ["build"], env = { SDL_VIDEODRIVER = "dummy" } }
+test = { depends-on = ["test-display", "test-weather", "test-editor", "test-contacts"] }
+
 test-display = { cmd = "mojo run -I . -Xlinker -L\"$CONDA_PREFIX/lib\" -Xlinker -lSDL3 tests/test_display.mojo", env = { SDL_VIDEODRIVER = "dummy" } }
 test-weather = { cmd = "mojo run -I . tests/test_weather.mojo" }
 test-editor = { cmd = "mojo run -I . tests/test_editor.mojo" }

@@ -66,10 +66,9 @@ distance; for circles, the wind matches potential flow past a cylinder.
 ```sh
 pixi run particles --gpu
 pixi run particles --particles 1000000 --frames 300
-pixi run test-display
-pixi run test-weather
-pixi run test-editor
-pixi run test-contacts
+pixi run test       # all tests
+pixi run smoke      # build, then run 30 headless frames
+pixi run format
 ```
 
 The simulation advances by the real time between frames, capped at 0.1

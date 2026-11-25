@@ -1,2 +1,3 @@
 /.pixi/
 .DS_Store
+/build/
