@@ -22,7 +22,7 @@ test-contacts = { cmd = "mojo run -I . tests/test_contacts.mojo" }
 
 [dependencies]
 # 1.0.0b2 release candidate, pinned until the beta package is published.
-larecs = { git = "https://github.com/larecs/larecs.git", rev = "d53ffa1b27cb9e0aad9d9322d14facae8aae8ffd" }
+larecs = { git = "https://github.com/larecs/larecs.git", rev = "613acf8401fd312a8f98500def3cc28f3615c4c9" }
 mojo = ">=1.0.0,<1.1.0"
 mojo-tracy = ">=1.1.0,<2"
 max = ">=26.5.0,<26.6"

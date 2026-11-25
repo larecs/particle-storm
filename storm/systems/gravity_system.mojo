@@ -34,7 +34,7 @@ struct GravitySystem[backend: ExecutionBackend](System):
     """Runs gravity acceleration on the selected execution backend.
 
     Parameters:
-        backend: HOST (threaded) or DEVICE execution for the kernel.
+        backend: HOST_THREADED or DEVICE execution for the kernel.
     """
 
     def update(mut self, mut context: SystemContext[...]) raises:
@@ -46,9 +46,4 @@ struct GravitySystem[backend: ExecutionBackend](System):
         Raises:
             Error: If kernel execution fails.
         """
-        comptime if Self.backend == ExecutionBackend.DEVICE:
-            context.run[gravity_kernel, backend=Self.backend]()
-        else:
-            context.run[
-                gravity_kernel, backend=ExecutionBackend.HOST_THREADED
-            ]()
+        context.run[gravity_kernel, backend=Self.backend]()

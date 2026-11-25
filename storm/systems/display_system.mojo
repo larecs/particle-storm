@@ -445,11 +445,13 @@ struct _Display(Movable):
         )
 
 
-struct DisplaySystem[backend: ExecutionBackend = ExecutionBackend.HOST](System):
+struct DisplaySystem[
+    backend: ExecutionBackend = ExecutionBackend.HOST_THREADED
+](System):
     """Rasterizes particles with a kernel and shows the image on the main thread.
 
     Parameters:
-        backend: HOST (threaded) or DEVICE execution for rasterization.
+        backend: HOST_THREADED or DEVICE execution for rasterization.
     """
 
     var _display: ArcPointer[_Display]
@@ -491,10 +493,7 @@ struct DisplaySystem[backend: ExecutionBackend = ExecutionBackend.HOST](System):
         if not running:
             resources.get[RunState]().running = False
             return
-        comptime if Self.backend == ExecutionBackend.DEVICE:
-            context.run[raster_kernel, backend=Self.backend]()
-        else:
-            context.run[raster_kernel, backend=ExecutionBackend.HOST_THREADED]()
+        context.run[raster_kernel, backend=Self.backend]()
         ref framebuffer = context.world[].resources.read[Framebuffer]()
         var highlight = -1
         display.hud.clear()
