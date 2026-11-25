@@ -2,7 +2,7 @@
 
 
 @fieldwise_init
-struct Acceleration(TrivialRegisterPassable):
+struct Acceleration(ImplicitlyCopyable, Movable):
     """Particle acceleration in meters per second squared."""
 
     var ddx: Float32

@@ -98,7 +98,7 @@ def _increment(counter: Pointer[UInt32, MutUntrackedOrigin]) -> Int:
 
 
 def _mut[
-    T: TrivialRegisterPassable
+    T: Movable & Deinitable
 ](values: List[T]) -> Pointer[T, MutUntrackedOrigin]:
     """Addresses host backing storage for a writer view.
 
@@ -117,7 +117,7 @@ def _mut[
 
 
 def _imm[
-    T: TrivialRegisterPassable
+    T: Movable & Deinitable
 ](values: List[T]) -> Pointer[T, ImmUntrackedOrigin]:
     """Addresses host backing storage for a read view.
 
@@ -314,21 +314,6 @@ struct ContactCountsAdapter(ResourceAdapter):
         """
         cache.download(0, Span(source.counts))
 
-    @staticmethod
-    def finalize[access: ResourceAccess](mut source: Self.Source) raises:
-        """Leaves published counts unchanged.
-
-        Parameters:
-            access: `WRITE` or `READ_WRITE`.
-
-        Args:
-            source: Counts holding published outputs.
-
-        Raises:
-            Error: Never.
-        """
-        pass
-
 
 @fieldwise_init
 struct ContactGridFill(TrivialRegisterPassable):
@@ -354,11 +339,14 @@ struct ContactGridFill(TrivialRegisterPassable):
                     to=self.cursors[unsafe_offset=self.shape.cell(position)]
                 )
             )
-            self.slots[unsafe_offset=slot] = position
+            # Metal can fail to compile a whole-Position store here.
+            ref target = self.slots[unsafe_offset=slot]
+            target.x = position.x
+            target.y = position.y
 
 
 @fieldwise_init
-struct ContactResponse(TrivialRegisterPassable):
+struct ContactResponse(Movable):
     """Displacement out of resting neighbors and how buried a particle is."""
 
     var push: Position
@@ -457,7 +445,7 @@ struct ContactGridRead(TrivialRegisterPassable):
                     start + _MAX_CELL_READS,
                 )
                 for s in range(start, end):
-                    var other = self.slots[unsafe_offset=s]
+                    ref other = self.slots[unsafe_offset=s]
                     var dx = x - other.x
                     var dy = y - other.y
                     var d2 = dx * dx + dy * dy
@@ -716,18 +704,3 @@ struct ContactGridAdapter(ResourceAdapter):
             Error: If staging fails.
         """
         cache.download(0, Span(source.slots)[: source.total()])
-
-    @staticmethod
-    def finalize[access: ResourceAccess](mut source: Self.Source) raises:
-        """Leaves published slots unchanged.
-
-        Parameters:
-            access: `WRITE` or `READ_WRITE`.
-
-        Args:
-            source: Grid holding published outputs.
-
-        Raises:
-            Error: Never.
-        """
-        pass

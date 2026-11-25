@@ -2,7 +2,7 @@
 
 
 @fieldwise_init
-struct Position(TrivialRegisterPassable):
+struct Position(ImplicitlyCopyable, Movable):
     """Particle or obstacle center in meters, with positive y pointing down."""
 
     var x: Float32

@@ -2,7 +2,7 @@
 
 
 @fieldwise_init
-struct Deposit(TrivialRegisterPassable):
+struct Deposit(ImplicitlyCopyable, Movable):
     """Whether a particle rests in a pile, and how much the pile shelters it.
 
     A particle is supported when it is slow and touches an obstacle or a

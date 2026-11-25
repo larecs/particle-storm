@@ -216,18 +216,3 @@ struct FramebufferAdapter(ResourceAdapter):
             Error: If staging fails.
         """
         cache.download(0, Span(source.pixels))
-
-    @staticmethod
-    def finalize[access: ResourceAccess](mut source: Self.Source) raises:
-        """Leaves published pixels unchanged.
-
-        Parameters:
-            access: `WRITE` or `READ_WRITE`.
-
-        Args:
-            source: Framebuffer holding published pixels.
-
-        Raises:
-            Error: Never.
-        """
-        pass

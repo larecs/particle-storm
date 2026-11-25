@@ -119,7 +119,7 @@ def main() raises:
     Raises:
         Error: If a check fails.
     """
-    check_backend[ExecutionBackend.HOST]()
+    check_backend[ExecutionBackend.HOST_THREADED]()
     comptime if has_accelerator():
         check_backend[ExecutionBackend.DEVICE]()
     print(

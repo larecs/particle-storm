@@ -190,7 +190,7 @@ struct ContactSystem[backend: ExecutionBackend](System):
     three kernel runs each.
 
     Parameters:
-        backend: HOST (threaded) or DEVICE execution for the kernels.
+        backend: HOST_THREADED or DEVICE execution for the kernels.
     """
 
     var passes: Int
@@ -230,23 +230,10 @@ struct ContactSystem[backend: ExecutionBackend](System):
             Error: If a resource is missing or kernel execution fails.
         """
         for _ in range(self.passes):
-            comptime if Self.backend == ExecutionBackend.DEVICE:
-                context.run[count_kernel, backend=Self.backend]()
-            else:
-                context.run[
-                    count_kernel, backend=ExecutionBackend.HOST_THREADED
-                ]()
+            context.run[count_kernel, backend=Self.backend]()
             ref resources = context.world[].resources
             resources.get[ContactGrid]().set_counts(
                 resources.read[ContactCounts]()
             )
-            comptime if Self.backend == ExecutionBackend.DEVICE:
-                context.run[scatter_kernel, backend=Self.backend]()
-                context.run[contact_kernel, backend=Self.backend]()
-            else:
-                context.run[
-                    scatter_kernel, backend=ExecutionBackend.HOST_THREADED
-                ]()
-                context.run[
-                    contact_kernel, backend=ExecutionBackend.HOST_THREADED
-                ]()
+            context.run[scatter_kernel, backend=Self.backend]()
+            context.run[contact_kernel, backend=Self.backend]()

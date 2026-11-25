@@ -90,7 +90,7 @@ struct WindSystem[backend: ExecutionBackend](System):
     """Runs wind acceleration on the selected execution backend.
 
     Parameters:
-        backend: HOST (threaded) or DEVICE execution for the kernel.
+        backend: HOST_THREADED or DEVICE execution for the kernel.
     """
 
     def update(mut self, mut context: SystemContext[...]) raises:
@@ -102,7 +102,4 @@ struct WindSystem[backend: ExecutionBackend](System):
         Raises:
             Error: If kernel execution fails.
         """
-        comptime if Self.backend == ExecutionBackend.DEVICE:
-            context.run[wind_kernel, backend=Self.backend]()
-        else:
-            context.run[wind_kernel, backend=ExecutionBackend.HOST_THREADED]()
+        context.run[wind_kernel, backend=Self.backend]()

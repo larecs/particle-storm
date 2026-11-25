@@ -12,10 +12,9 @@ from storm.components import (
 )
 from storm.options import Options
 from storm.resources import Bounds, Physics, RunState, Storm, Time
-from storm.scene import add_default_obstacles
+from storm.scene import add_default_obstacles, add_particles
 from storm.systems import (
     ContactSystem,
-    CreationSystem,
     DisplaySystem,
     EditorSystem,
     GravitySystem,
@@ -42,22 +41,19 @@ def main() raises:
     )
     # Keeps unchanged columns on the device between GPU kernel runs.
     world.reuse_device_copies(options.on_gpu)
-    world.resources.add(Time())
-    world.resources.add(Bounds())
-    world.resources.add(RunState())
-    world.resources.add(Physics(snow=0.2, sand=0.8))
-    world.resources.add(Storm())
+    world.resources.add(
+        Time(), Bounds(), RunState(), Physics(snow=0.2, sand=0.8), Storm()
+    )
     add_default_obstacles(world)
+    add_particles(world, options.particles)
 
     var scheduler = Scheduler(world^)
-    scheduler.add_system(CreationSystem(options.particles))
     scheduler.add_system(TimeSystem(frame_limit=options.frames))
     scheduler.add_system(EditorSystem())
     scheduler.add_system(ObstacleSystem())
     if options.on_gpu:
         comptime if has_accelerator():
             scheduler.add_system(WindSystem[ExecutionBackend.DEVICE]())
-            # scheduler.add_system(GravitySystem[ExecutionBackend.DEVICE]())
             scheduler.add_system(MovementSystem[ExecutionBackend.DEVICE]())
             scheduler.add_system(ContactSystem[ExecutionBackend.DEVICE]())
             scheduler.add_system(DisplaySystem[ExecutionBackend.DEVICE]())
@@ -65,11 +61,11 @@ def main() raises:
         else:
             raise Error("--gpu requires an available accelerator")
     else:
-        scheduler.add_system(WindSystem[ExecutionBackend.HOST]())
-        scheduler.add_system(GravitySystem[ExecutionBackend.HOST]())
-        scheduler.add_system(MovementSystem[ExecutionBackend.HOST]())
-        scheduler.add_system(ContactSystem[ExecutionBackend.HOST]())
-        scheduler.add_system(DisplaySystem[ExecutionBackend.HOST]())
+        scheduler.add_system(WindSystem[ExecutionBackend.HOST_THREADED]())
+        scheduler.add_system(GravitySystem[ExecutionBackend.HOST_THREADED]())
+        scheduler.add_system(MovementSystem[ExecutionBackend.HOST_THREADED]())
+        scheduler.add_system(ContactSystem[ExecutionBackend.HOST_THREADED]())
+        scheduler.add_system(DisplaySystem[ExecutionBackend.HOST_THREADED]())
         print("Simulation backend: CPU")
     scheduler.initialize()
     while scheduler.world.resources.get[RunState]().running:

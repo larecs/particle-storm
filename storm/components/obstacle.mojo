@@ -2,7 +2,7 @@
 
 
 @fieldwise_init
-struct Obstacle(TrivialRegisterPassable):
+struct Obstacle(ImplicitlyCopyable, Movable):
     """Marks an entity as a solid circle or rotated rectangle.
 
     The entity's Position is the shape's center. Use `ObstacleBuilder` to

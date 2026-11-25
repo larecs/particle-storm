@@ -2,7 +2,7 @@
 
 
 @fieldwise_init
-struct ParticleType(TrivialRegisterPassable):
+struct ParticleType(ImplicitlyCopyable, Movable):
     """Index selecting a particle's response time and display color."""
 
     var id: Int
